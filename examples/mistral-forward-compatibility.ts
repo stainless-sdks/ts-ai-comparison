@@ -96,15 +96,15 @@ async function testMistralForwardCompatibility() {
 
     // Test 3: Check if new enum values break the SDK
     console.log("\nTest 3: Testing new enum values...");
-    console.log("Finish reason:", response.choices[0].finish_reason);
-    console.log("Finish reason type:", typeof response.choices[0].finish_reason);
+    console.log("Finish reason:", response.choices[0].finishReason);
+    console.log("Finish reason type:", typeof response.choices[0].finishReason);
 
     // Try to use the finish_reason in a conditional
-    if (response.choices[0].finish_reason === "new_experimental_finish") {
+    if (response.choices[0].finishReason === "new_experimental_finish") {
       console.log("✅ SDK accepts new enum values without breaking");
     } else {
       console.log("❌ SDK may have transformed or rejected the new enum value");
-      console.log("  Actual value received:", response.choices[0].finish_reason);
+      console.log("  Actual value received:", response.choices[0].finishReason);
     }
 
   } catch (error) {

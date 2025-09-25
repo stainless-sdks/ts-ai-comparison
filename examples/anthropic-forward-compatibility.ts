@@ -91,7 +91,7 @@ async function testAnthropicForwardCompatibility() {
     console.log("Stop reason type:", typeof message.stop_reason);
 
     // Try to use the stop_reason in a conditional (this would break if SDK validates enums strictly)
-    if (message.stop_reason === "new_experimental_stop_reason") {
+    if ((message.stop_reason as any) === "new_experimental_stop_reason") {
       console.log("✅ SDK accepts new enum values without breaking");
     } else {
       console.log("❌ SDK may have transformed or rejected the new enum value");
