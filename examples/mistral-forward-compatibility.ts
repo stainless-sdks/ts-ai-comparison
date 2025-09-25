@@ -16,7 +16,7 @@ const mockResponse = {
         content:
           "Hello! Here's a TypeScript fact: It adds static typing to JavaScript!",
       },
-      finish_reason: "stop",
+      finish_reason: "new_experimental_finish",
     },
   ],
   usage: {
@@ -94,33 +94,19 @@ async function testMistralForwardCompatibility() {
       console.log("❌ Undocumented property not found in response");
     }
 
-    // Test 3: Check if TypeScript types are preserved
-    console.log("\nTest 3: Checking TypeScript type safety...");
-    console.log("Response object:", response.object);
-    console.log("First choice role:", response.choices[0].message.role);
-    console.log("✅ TypeScript types work correctly for documented properties");
+    // Test 3: Check if new enum values break the SDK
+    console.log("\nTest 3: Testing new enum values...");
+    console.log("Finish reason:", response.choices[0].finish_reason);
+    console.log("Finish reason type:", typeof response.choices[0].finish_reason);
 
-    // Test 4: Check the raw response object
-    console.log("\nTest 4: Inspecting full response object...");
-    console.log("All response keys:", Object.keys(response));
-
-    // Test 5: Check if we can access nested undocumented properties
-    console.log("\nTest 5: Accessing nested undocumented properties...");
-    if (
-      responseAny.undocumented_property?.experimental_data?.confidence_score
-    ) {
-      console.log("✅ Nested undocumented property accessible:");
-      console.log(
-        "  confidence_score:",
-        responseAny.undocumented_property.experimental_data.confidence_score
-      );
-      console.log(
-        "  processing_time_ms:",
-        responseAny.undocumented_property.experimental_data.processing_time_ms
-      );
+    // Try to use the finish_reason in a conditional
+    if (response.choices[0].finish_reason === "new_experimental_finish") {
+      console.log("✅ SDK accepts new enum values without breaking");
     } else {
-      console.log("❌ Nested undocumented properties not accessible");
+      console.log("❌ SDK may have transformed or rejected the new enum value");
+      console.log("  Actual value received:", response.choices[0].finish_reason);
     }
+
   } catch (error) {
     console.error("❌ Error during forward compatibility test:", error);
   }

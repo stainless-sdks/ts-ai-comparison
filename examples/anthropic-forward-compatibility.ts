@@ -14,7 +14,7 @@ const mockResponse = {
     },
   ],
   model: "claude-3-sonnet-20241022",
-  stop_reason: "end_turn",
+  stop_reason: "new_experimental_stop_reason",
   stop_sequence: null,
   usage: {
     input_tokens: 15,
@@ -85,15 +85,19 @@ async function testAnthropicForwardCompatibility() {
       console.log("❌ Undocumented property not found in response");
     }
 
-    // Test 3: Check if TypeScript types are preserved
-    console.log("\nTest 3: Checking TypeScript type safety...");
-    console.log("Message type:", message.type);
-    console.log("Content type:", message.content[0].type);
-    console.log("✅ TypeScript types work correctly for documented properties");
+    // Test 3: Check if new enum values break the SDK
+    console.log("\nTest 3: Testing new enum values...");
+    console.log("Stop reason:", message.stop_reason);
+    console.log("Stop reason type:", typeof message.stop_reason);
 
-    // Test 4: Check the raw response object
-    console.log("\nTest 4: Inspecting full response object...");
-    console.log("All response keys:", Object.keys(message));
+    // Try to use the stop_reason in a conditional (this would break if SDK validates enums strictly)
+    if (message.stop_reason === "new_experimental_stop_reason") {
+      console.log("✅ SDK accepts new enum values without breaking");
+    } else {
+      console.log("❌ SDK may have transformed or rejected the new enum value");
+      console.log("  Actual value received:", message.stop_reason);
+    }
+
   } catch (error) {
     console.error("❌ Error during forward compatibility test:", error);
   }
