@@ -22,7 +22,6 @@ const getWeatherTool = {
   },
 };
 
-// Tool implementations
 const tools = {
   getWeather: ({ location }: { location: string }) => {
     return `The weather is foggy with a temperature of 20°C in ${location}.`;
@@ -45,12 +44,10 @@ async function main() {
 
   const choice = response.choices[0];
 
-  // Check if model wants to use a tool
   if (choice.message.toolCalls && choice.message.toolCalls.length > 0) {
     const toolCall = choice.message.toolCalls[0];
     const toolName = toolCall.function.name as keyof typeof tools;
 
-    // Parse arguments and call the appropriate tool
     const args =
       typeof toolCall.function.arguments === "string"
         ? JSON.parse(toolCall.function.arguments)
@@ -58,7 +55,6 @@ async function main() {
 
     const toolResult = tools[toolName](args);
 
-    // Send tool result back to get final response
     const finalResponse = await client.chat.complete({
       messages: [
         {

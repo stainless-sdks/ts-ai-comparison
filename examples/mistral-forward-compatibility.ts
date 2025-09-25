@@ -52,7 +52,6 @@ async function testMistralForwardCompatibility() {
   console.log("=== Mistral Forward Compatibility Test ===\n");
 
   try {
-    // Test 1: Try to pass undocumented parameter
     console.log("Test 1: Passing undocumented parameter to request...");
     const requestParams: ChatCompletionRequest = {
       model: "mistral-small-latest",
@@ -63,22 +62,18 @@ async function testMistralForwardCompatibility() {
         },
       ],
       maxTokens: 1024,
-      // This should be an undocumented parameter
       // @ts-expect-error
       undocumented_param: "test_value",
       experimental_feature: true,
     };
 
-    // Type assertion to bypass TypeScript checking for undocumented params
     const response = await mistral.chat.complete(requestParams);
 
     console.log("✅ Request with undocumented parameter succeeded");
     console.log("Response ID:", response.id);
 
-    // Test 2: Try to access undocumented property from response
     console.log("\nTest 2: Accessing undocumented property from response...");
 
-    // Check if the undocumented property exists
     const responseAny = response as any;
     if (responseAny.undocumented_property) {
       console.log("✅ Undocumented property found in response:");
@@ -94,12 +89,10 @@ async function testMistralForwardCompatibility() {
       console.log("❌ Undocumented property not found in response");
     }
 
-    // Test 3: Check if new enum values break the SDK
     console.log("\nTest 3: Testing new enum values...");
     console.log("Finish reason:", response.choices[0].finishReason);
     console.log("Finish reason type:", typeof response.choices[0].finishReason);
 
-    // Try to use the finish_reason in a conditional
     if (response.choices[0].finishReason === "new_experimental_finish") {
       console.log("✅ SDK accepts new enum values without breaking");
     } else {
@@ -110,8 +103,6 @@ async function testMistralForwardCompatibility() {
     console.error("❌ Error during forward compatibility test:", error);
   }
 }
-
-// Simple mock implementation without jest
 
 if (require.main === module) {
   testMistralForwardCompatibility().finally(() => {

@@ -5,7 +5,6 @@ import {
   Messages,
 } from "@anthropic-ai/sdk/resources/messages";
 
-// Mock the fetch function to add undocumented properties to the response
 const originalFetch = global.fetch;
 
 const mockResponse: Messages.Message = {
@@ -54,7 +53,6 @@ async function testAnthropicForwardCompatibility() {
   console.log("=== Anthropic Forward Compatibility Test ===\n");
 
   try {
-    // Test 1: Try to pass undocumented parameter
     console.log("Test 1: Passing undocumented parameter to request...");
     const requestParams: MessageCreateParamsNonStreaming = {
       model: "claude-3-sonnet-20241022",
@@ -70,16 +68,13 @@ async function testAnthropicForwardCompatibility() {
       undocumented_param: "test_value",
     };
 
-    // Type assertion to bypass TypeScript checking for undocumented params
     const message = await anthropic.messages.create(requestParams);
 
     console.log("✅ Request with undocumented parameter succeeded");
     console.log("Response ID:", message);
 
-    // Test 2: Try to access undocumented property from response
     console.log("\nTest 2: Accessing undocumented property from response...");
 
-    // Check if the undocumented property exists
     // @ts-expect-error
     if (message.undocumented_property === "new feature!") {
       console.log("✅ Undocumented property found in response:");
@@ -87,12 +82,10 @@ async function testAnthropicForwardCompatibility() {
       console.log("❌ Undocumented property not found in response");
     }
 
-    // Test 3: Check if new enum values break the SDK
     console.log("\nTest 3: Testing new enum values...");
     console.log("Stop reason:", message.stop_reason);
     console.log("Stop reason type:", typeof message.stop_reason);
 
-    // Try to use the stop_reason in a conditional (this would break if SDK validates enums strictly)
     if ((message.stop_reason as any) === "new_experimental_stop_reason") {
       console.log("✅ SDK accepts new enum values without breaking");
     } else {
@@ -104,11 +97,8 @@ async function testAnthropicForwardCompatibility() {
   }
 }
 
-// Simple mock implementation without jest
-
 if (require.main === module) {
   testAnthropicForwardCompatibility().finally(() => {
-    // Restore original fetch
     global.fetch = originalFetch;
   });
 }
