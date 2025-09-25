@@ -2,7 +2,7 @@
   "name": "ts-comparison",
   "packageManager": "yarn@4.6.0",
   "scripts": {
-    "lint": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.63.1",

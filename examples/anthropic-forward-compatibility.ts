@@ -48,7 +48,7 @@ async function testAnthropicForwardCompatibility() {
     // Test 1: Try to pass undocumented parameter
     console.log("Test 1: Passing undocumented parameter to request...");
     const requestParams = {
-      model: "claude-3-sonnet-20241022" as const,
+      model: "claude-3-sonnet-20241022",
       max_tokens: 1024,
       messages: [
         {
