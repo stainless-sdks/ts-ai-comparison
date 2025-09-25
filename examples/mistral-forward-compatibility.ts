@@ -1,9 +1,13 @@
 import { Mistral } from "@mistralai/mistralai";
+import {
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+} from "@mistralai/mistralai/models/components";
 
 // Mock the fetch function to add undocumented properties to the response
 const originalFetch = global.fetch;
 
-const mockResponse = {
+const mockResponse: ChatCompletionResponse = {
   id: "cmpl-abc123",
   object: "chat.completion",
   created: 1699896916,
@@ -16,22 +20,17 @@ const mockResponse = {
         content:
           "Hello! Here's a TypeScript fact: It adds static typing to JavaScript!",
       },
+      // @ts-expect-error
       finish_reason: "new_experimental_finish",
     },
   ],
   usage: {
-    prompt_tokens: 15,
-    completion_tokens: 20,
-    total_tokens: 35,
+    promptTokens: 15,
+    completionTokens: 20,
+    totalTokens: 35,
   },
   // This is the undocumented property we're adding
-  undocumented_property: {
-    new_feature: "This is a new feature from the Mistral API",
-    experimental_data: {
-      confidence_score: 0.95,
-      processing_time_ms: 150,
-    },
-  },
+  undocumented_property: "new feature!",
 };
 
 global.fetch = (() =>
@@ -55,7 +54,7 @@ async function testMistralForwardCompatibility() {
   try {
     // Test 1: Try to pass undocumented parameter
     console.log("Test 1: Passing undocumented parameter to request...");
-    const requestParams = {
+    const requestParams: ChatCompletionRequest = {
       model: "mistral-small-latest",
       messages: [
         {
@@ -63,8 +62,9 @@ async function testMistralForwardCompatibility() {
           content: "Hello!",
         },
       ],
-      max_tokens: 1024,
+      maxTokens: 1024,
       // This should be an undocumented parameter
+      // @ts-expect-error
       undocumented_param: "test_value",
       experimental_feature: true,
     };
@@ -106,7 +106,6 @@ async function testMistralForwardCompatibility() {
       console.log("❌ SDK may have transformed or rejected the new enum value");
       console.log("  Actual value received:", response.choices[0].finishReason);
     }
-
   } catch (error) {
     console.error("❌ Error during forward compatibility test:", error);
   }

@@ -1,9 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
+import {
+  MessageCreateParamsBase,
+  MessageCreateParamsNonStreaming,
+  Messages,
+} from "@anthropic-ai/sdk/resources/messages";
 
 // Mock the fetch function to add undocumented properties to the response
 const originalFetch = global.fetch;
 
-const mockResponse = {
+const mockResponse: Messages.Message = {
   id: "msg_01ABC123",
   type: "message",
   role: "assistant",
@@ -11,20 +16,24 @@ const mockResponse = {
     {
       type: "text",
       text: "Hello! Here's a fun TypeScript fact: TypeScript was first released in 2012.",
+      citations: null,
     },
   ],
   model: "claude-3-sonnet-20241022",
+  // @ts-expect-error
   stop_reason: "new_experimental_stop_reason",
   stop_sequence: null,
   usage: {
     input_tokens: 15,
     output_tokens: 20,
+    cache_creation: null,
+    cache_creation_input_tokens: null,
+    cache_read_input_tokens: null,
+    server_tool_use: null,
+    service_tier: null,
   },
   // This is the undocumented property we're adding
-  undocumented_property: {
-    new_feature: "This is a new feature from the API",
-    experimental_data: [1, 2, 3, 4, 5],
-  },
+  undocumented_property: "new feature!",
 };
 
 global.fetch = (() =>
@@ -47,7 +56,7 @@ async function testAnthropicForwardCompatibility() {
   try {
     // Test 1: Try to pass undocumented parameter
     console.log("Test 1: Passing undocumented parameter to request...");
-    const requestParams = {
+    const requestParams: MessageCreateParamsNonStreaming = {
       model: "claude-3-sonnet-20241022",
       max_tokens: 1024,
       messages: [
@@ -57,6 +66,7 @@ async function testAnthropicForwardCompatibility() {
         },
       ],
       // This should be an undocumented parameter
+      // @ts-expect-error
       undocumented_param: "test_value",
     };
 
@@ -64,23 +74,15 @@ async function testAnthropicForwardCompatibility() {
     const message = await anthropic.messages.create(requestParams);
 
     console.log("✅ Request with undocumented parameter succeeded");
-    console.log("Response ID:", message.id);
+    console.log("Response ID:", message);
 
     // Test 2: Try to access undocumented property from response
     console.log("\nTest 2: Accessing undocumented property from response...");
 
     // Check if the undocumented property exists
-    const messageAny = message as any;
-    if (messageAny.undocumented_property) {
+    // @ts-expect-error
+    if (message.undocumented_property === "new feature!") {
       console.log("✅ Undocumented property found in response:");
-      console.log(
-        "  new_feature:",
-        messageAny.undocumented_property.new_feature
-      );
-      console.log(
-        "  experimental_data:",
-        messageAny.undocumented_property.experimental_data
-      );
     } else {
       console.log("❌ Undocumented property not found in response");
     }
@@ -97,7 +99,6 @@ async function testAnthropicForwardCompatibility() {
       console.log("❌ SDK may have transformed or rejected the new enum value");
       console.log("  Actual value received:", message.stop_reason);
     }
-
   } catch (error) {
     console.error("❌ Error during forward compatibility test:", error);
   }

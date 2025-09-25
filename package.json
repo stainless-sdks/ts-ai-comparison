@@ -1,6 +1,6 @@
 {
   "name": "ts-comparison",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
